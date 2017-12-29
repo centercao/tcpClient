@@ -12,6 +12,10 @@ Array.prototype.remove = function(val) {
 };
 function context(socket,cet) {
 	this.request = {}; // 请求结构
+	this.request.rvLen = 0;
+	this.request.cmd = -1;
+	this.request.dataLen = 0;
+	this.request.state = false;
 	this.response = {};// 响应结构
 	this.request.dataBuffers = [];
 }
@@ -19,6 +23,10 @@ function cet() {
 	this.middleware = [];
 	this.socket = null;
 	this.request = {}; // 请求结构
+	this.request.rvLen = 0;
+	this.request.cmd = -1;
+	this.request.dataLen = 0;
+	this.request.state = false;
 	this.response = {};// 响应结构
 	this.request.dataBuffers = [];
 }
@@ -57,19 +65,26 @@ cet.prototype = {
 		});
 		// Receive
 		var that = this;
-		this.socket.on('data', function (data) {
-			that.request.dataBuffers.push(data);
-			// that.request.rvLen += data.length;
+		function dealData(that) {
 			// 激发中间件处理接收到的数据
 			that.trigger(that).then(function () {
 				if(that.response.data){ // 中间件处理完毕需要发送响应的请填写响应数据
 					that.send(that.response.data); // 发送响应数据
 					that.response = {}; // 初始化响应
 				}
+				if(that.request.rvLen > 0){
+					dealData(that);
+				}
 			}).catch(function (err) {
 				console.log("error:"  + err.message);
 				that.close();
 			});
+		}
+		this.socket.on('data', function (data) {
+			that.request.dataBuffers.push(data);
+			that.request.rvLen += data.length;
+			// 激发中间件处理接收到的数据
+			dealData(that);
 		});
 		this.socket.connect(port, host,function () {
 			console.log('CONNECTED TO: ' + host + ':' + port);
