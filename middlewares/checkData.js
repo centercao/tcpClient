@@ -14,6 +14,8 @@ module.exports = function() {
 				ctx.request.cmd = buffer.readUInt16BE(2); // cmd
 				ctx.request.dataLen = buffer.readUInt16BE(4);
 				ctx.request.state = true;
+			}else{
+				ctx.request.isContinue = 0;
 			}
 		}
 		if(ctx.request.state){
@@ -26,7 +28,14 @@ module.exports = function() {
 				ctx.request.dataBuffers .length = 0;
 				if(ctx.request.rvLen > 0){
 					ctx.request.dataBuffers.push(buffer.slice(ctx.request.dataLen + 6));
+					if(ctx.ctx.request.rvLen >= 6 ){
+						ctx.request.isContinue = 1;
+					}else{
+						ctx.request.isContinue = 0;
+					}
 				}
+			}else{
+				ctx.request.isContinue = 0;
 			}
 		}
 	};

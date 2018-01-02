@@ -16,6 +16,7 @@ function context(socket,cet) {
 	this.request.cmd = -1;
 	this.request.dataLen = 0;
 	this.request.state = false;
+	this.request.isContinue = 0;
 	this.response = {};// 响应结构
 	this.request.dataBuffers = [];
 }
@@ -72,7 +73,7 @@ cet.prototype = {
 					that.send(that.response.data); // 发送响应数据
 					that.response = {}; // 初始化响应
 				}
-				if(that.request.rvLen > 0){
+				if(that.request.rvLen > 0 && that.request.isContinue > 0){
 					dealData(that);
 				}
 			}).catch(function (err) {

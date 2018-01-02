@@ -75,7 +75,7 @@ resBuffer.write("BVvT5k5KqG8cLigR",7);
 console.log((new Date).format("yyyy-M-d h:m:s.S")  + " 发送网关注册....");
 app.send(resBuffer);
 setInterval(function () {
-	let buffer = new Buffer(18);
+	let buffer = new Buffer(27);
 	buffer.writeUInt16BE(0xAA75,0); // header
 	buffer.writeUInt16BE(0x0,2); // cmd1
 	buffer.writeUInt16BE(3,4); // len
@@ -88,6 +88,13 @@ setInterval(function () {
 	buffer.writeUInt8(8,15); // cmd2
 	buffer.writeUInt8(1,16);
 	buffer.writeUInt8(1,17);
+	
+	buffer.writeUInt16BE(0xAA75,18); // header
+	buffer.writeUInt16BE(0x0,20); // cmd1
+	buffer.writeUInt16BE(3,22); // len
+	buffer.writeUInt8(8,24); // cmd2
+	buffer.writeUInt8(1,25);
+	buffer.writeUInt8(1,26);
 	console.log((new Date).format("yyyy-M-d h:m:s.S")  + " 发送网关状态....");
 	app.send(buffer);
 },5000);
